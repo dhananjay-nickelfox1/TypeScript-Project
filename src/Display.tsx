@@ -1,46 +1,31 @@
 import { ReactElement } from "react";
 import "./App.css";
-
-interface listType {
-  content: string;
-  id: number;
-  edit: boolean;
-}
-
-type displayProps = {
-  list: Array<listType>;
-  setList: React.Dispatch<React.SetStateAction<Array<listType>>>;
-};
-
-export const Display = ({ list, setList }: displayProps): ReactElement => {
+import type { RootState } from "./store/store";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteItem, editItem, changeValue } from "./slice/listSlice";
+export const Display = (): ReactElement => {
+  const inputList = useSelector((state: RootState) => state.list.value);
+  const dispatch = useDispatch();
   const handleDelete = (id: number): void => {
-    setList(list.filter((item) => item.id !== id));
+    dispatch(deleteItem(id));
   };
 
   const onEditClick = (id: number, state: boolean): void => {
-    const newList = [...list];
-    newList.forEach((item) => {
-      if (item?.id === id) item.edit = state;
-    });
-    setList(newList);
+    dispatch(editItem(id));
   };
 
   const handleOnChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     id: number
   ): void => {
-    const value: string = e.target.value;
-    const newList = [...list];
-    newList.forEach((item) => {
-      if (item?.id === id) item.content = value;
-    });
-    setList(newList);
+    const content: string = e.target.value;
+    dispatch(changeValue({ id, content }));
   };
 
   return (
     <>
       <ul>
-        {list.map((item) => (
+        {inputList.map((item) => (
           <>
             <li>
               {!item?.edit && (
